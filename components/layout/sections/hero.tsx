@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { fadeInUp } from '@/lib/motion';
+import useMobileCheck from '@/hooks/useMobileCheck';
 
 const containerVariants = {
   hidden: {},
@@ -20,7 +21,7 @@ const containerVariants = {
 
 export const HeroSection = () => {
   const { theme } = useTheme();
-
+  const isMobile = useMobileCheck();
   return (
     <section className='container w-full py-24 md:py-36 bg-background'>
       {/* Glow background */}
@@ -46,7 +47,7 @@ export const HeroSection = () => {
 
         {/* Title */}
         <motion.h1
-          className='text-4xl md:text-6xl font-extrabold tracking-tight leading-tight max-w-4xl'
+          className='text-2xl md:text-6xl font-extrabold tracking-tight leading-tight max-w-4xl'
           variants={fadeInUp}
         >
           Automate
@@ -64,11 +65,11 @@ export const HeroSection = () => {
 
         {/* Buttons */}
         <motion.div className='flex sm:flex-row gap-4 mt-10 justify-center' variants={fadeInUp}>
-          <Button size='lg' className='font-semibold group'>
+          <Button size={isMobile ? 'sm' : 'lg'} className='font-semibold group'>
             Book a Demo
             <ArrowRight className='ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform' />
           </Button>
-          <Button asChild size='lg' variant='secondary' className='font-semibold'>
+          <Button asChild size={isMobile ? 'sm' : 'lg'} variant='secondary' className='font-semibold'>
             <Link href='/contact'>Talk to an Expert</Link>
           </Button>
         </motion.div>

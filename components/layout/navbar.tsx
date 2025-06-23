@@ -266,11 +266,38 @@ export function Navbar() {
             <SheetHeader>
               <SheetTitle className='text-left'>Navigation</SheetTitle>
             </SheetHeader>
+
+            {/* Navigation Links */}
             <nav className='flex flex-col space-y-3 mt-6'>
               {navigationItems.map((item, index) => (
                 <MobileNavItem key={item.title} item={item} index={index} />
               ))}
             </nav>
+
+            {/* Divider */}
+            <div className='my-6 border-t border-border' />
+
+            {/* Socials & Theme Toggle */}
+            <ul className='flex items-center gap-3'>
+              <li>
+                <ToggleTheme />
+              </li>
+              <li>
+                <Button size='sm' variant='ghost' className='w-full justify-start'>
+                  <Instagram className='size-5' />
+                </Button>
+              </li>
+              <li>
+                <Button size='sm' variant='ghost' className='w-full justify-start'>
+                  <Linkedin className='size-5' />
+                </Button>
+              </li>
+              <li>
+                <Button size='sm' variant='ghost' className='w-full justify-start'>
+                  <Mail className='size-5' />
+                </Button>
+              </li>
+            </ul>
           </SheetContent>
         </Sheet>
 
