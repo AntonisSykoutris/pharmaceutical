@@ -1,4 +1,4 @@
-import { Database } from "@/lib/database.types";
+import { Database } from "../database.types";
 
 // Database Models
 export type Task = Database["public"]["Tables"]["tasks"]["Row"];

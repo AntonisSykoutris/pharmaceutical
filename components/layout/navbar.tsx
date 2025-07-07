@@ -254,7 +254,7 @@ export function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className='h-8 w-8 cursor-pointer'>
-                    <AvatarImage src={user?.avatarUrl || '/default-avatar.png'} alt='User avatar' />
+                    <AvatarImage src={'/default-avatar.png'} alt='User avatar' />
                     <AvatarFallback>{user?.email?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
