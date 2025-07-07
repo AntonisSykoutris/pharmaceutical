@@ -9,6 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { fadeInUp } from '@/lib/motion';
 import useMobileCheck from '@/hooks/useMobileCheck';
+import ActionButton from '@/components/common/action-button';
 
 const containerVariants = {
   hidden: {},
@@ -65,13 +66,8 @@ export const HeroSection = () => {
 
         {/* Buttons */}
         <motion.div className='flex sm:flex-row gap-4 mt-10 justify-center' variants={fadeInUp}>
-          <Button size={isMobile ? 'sm' : 'lg'} className='font-semibold group'>
-            Book a Demo
-            <ArrowRight className='ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform' />
-          </Button>
-          <Button asChild size={isMobile ? 'sm' : 'lg'} variant='secondary' className='font-semibold'>
-            <Link href='/contact'>Talk to an Expert</Link>
-          </Button>
+          <ActionButton name='Book a Demo' onClick={() => console.log('Demo booked')} variant='primary' />
+          <ActionButton name='Talk to an Expert' href='/contact' variant='secondary' />
         </motion.div>
 
         {/* Image with motion */}

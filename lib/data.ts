@@ -1,4 +1,4 @@
-import { NavDataType, Section } from './types';
+import { NavDataType, Section } from './types/common';
 
 export const MOTION_SLIDE_DEFAULT_DELAY = 0.5;
 

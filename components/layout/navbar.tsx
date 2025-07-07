@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Menu, ChevronDown, Instagram, Linkedin, Mail } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,13 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { ToggleTheme } from './toogle-theme';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@radix-ui/react-dropdown-menu';
 
 const navigationItems = [
   {
@@ -27,23 +35,6 @@ const navigationItems = [
   {
     title: 'Platform',
     href: '/platform',
-    items: [
-      {
-        title: 'Workflow Automation',
-        href: '/platform/workflow-automation',
-        description: 'Automate document approvals, SOPs, and compliance checks.',
-      },
-      {
-        title: 'Document Management',
-        href: '/platform/document-management',
-        description: 'Centralized, searchable, and audit-ready documentation.',
-      },
-      {
-        title: 'Regulatory Compliance',
-        href: '/platform/regulatory-compliance',
-        description: 'Stay aligned with FDA, EMA, GMP, and other regulations.',
-      },
-    ],
   },
   {
     title: 'Solutions',
@@ -86,8 +77,9 @@ const ListItem = React.forwardRef<
   return (
     <li>
       <NavigationMenuLink asChild>
-        <a
+        <Link
           ref={ref}
+          href={props.href ?? '/'}
           className={cn(
             'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-all duration-200 hover:bg-white/25 hover:backdrop-blur-md hover:border-white/40 hover:shadow-lg focus:bg-white/25 focus:backdrop-blur-md focus:border-white/40 focus:shadow-lg border border-transparent',
             className
@@ -102,7 +94,7 @@ const ListItem = React.forwardRef<
               {description}
             </p>
           )}
-        </a>
+        </Link>
       </NavigationMenuLink>
     </li>
   );
@@ -195,6 +187,7 @@ function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; ind
 
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { isLoggedIn, signOut, user } = useAuth(); // ensure your useAuth returns user info
 
   return (
     <header className='sticky top-0 z-[50] w-full border-b border-white/20 bg-white/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/10 shadow-lg'>
@@ -225,13 +218,12 @@ export function Navbar() {
                       <div className='bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg shadow-2xl overflow-hidden'>
                         <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] overflow-visible'>
                           {item.items.map(subItem => (
-                            <ListItem
-                              key={subItem.title}
-                              title={subItem.title}
-                              description={subItem.description}
-                              href={subItem.href}
-                              className='transition-all duration-200'
-                            />
+                            <li key={subItem.title}>
+                              <Link href={subItem.href} className='block p-2 rounded hover:bg-gray-100 transition'>
+                                <p className='font-medium'>{subItem.title}</p>
+                                <p className='text-sm text-gray-600'>{subItem.description}</p>
+                              </Link>
+                            </li>
                           ))}
                         </ul>
                       </div>
@@ -248,6 +240,37 @@ export function Navbar() {
             ))}
           </NavigationMenuList>
         </NavigationMenu>
+        <div className='flex items-center space-x-4'>
+          {!isLoggedIn ? (
+            <Button asChild variant='outline'>
+              <Link href='/signIn'>Sign In</Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant='outline' onClick={signOut}>
+                Sign Out
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className='h-8 w-8 cursor-pointer'>
+                    <AvatarImage src={user?.avatarUrl || '/default-avatar.png'} alt='User avatar' />
+                    <AvatarFallback>{user?.email?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuItem asChild>
+                    <Link href='/platform'>Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href='/settings'>Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>Sign Out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
+        </div>
 
         {/* Mobile Navigation */}
         <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
