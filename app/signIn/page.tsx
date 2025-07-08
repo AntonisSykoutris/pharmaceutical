@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { LogIn, Mail, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ActionButton from '@/components/common/action-button';
+import Section from '@/components/common/section';
 
 const AuthUI = () => {
   const router = useRouter();
@@ -48,18 +49,17 @@ const AuthUI = () => {
   };
 
   return (
-    <section id='features' className='container py-24 sm:py-32 relative min-h-screen flex items-center justify-center '>
-      {/* Glow background */}
-      <div className='absolute -z-10 inset-0 overflow-hidden flex justify-center'>
-        <div className='w-[600px] h-[600px] bg-gradient-to-r from-[#D247BF] to-primary opacity-30 blur-3xl rounded-full mt-32' />
-      </div>
-      <div className='max-w-md w-full bg-white p-8 rounded-xl shadow-md'>
+    <Section id='auth' className='flex items-center justify-center min-h-screen' showGradient>
+      <div className='max-w-md w-full  dark:bg-card bg-background transition-all number flex flex-col p-8 rounded-xl'>
         <h1 className='text-3xl font-bold mb-6 text-center'>{isSignUpMode ? 'Create an Account' : 'Welcome Back'}</h1>
 
-        <Button variant='outline' className='w-full mb-4' onClick={handleGoogleLogin}>
-          <LogIn className='mr-2 h-4 w-4' />
-          Continue with Google
-        </Button>
+        <ActionButton
+          name='Continue with Google'
+          variant='secondary'
+          className='w-full mb-4'
+          onClick={handleGoogleLogin}
+          type='submit'
+        />
 
         <div className='flex items-center my-4'>
           <div className='flex-grow border-t border-gray-300'></div>
@@ -129,7 +129,7 @@ const AuthUI = () => {
           </Link>
         </p>
       </div>
-    </section>
+    </Section>
   );
 };
 

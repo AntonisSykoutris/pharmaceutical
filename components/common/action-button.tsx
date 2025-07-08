@@ -35,12 +35,12 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
   const classes = cn(
     'font-semibold group',
-    variant === 'primary' && 'bg-orange-500 text-white hover:bg-orange-600',
+    variant === 'primary' && '!bg-orange-500 text-white hover:bg-orange-600',
     className
   );
 
   const Wrapper = variant === 'secondary' ? motion.div : React.Fragment;
-  const wrapperProps = variant === 'secondary' ? { whileTap: { scale: 0.95 }, className: 'inline-block' } : {};
+  const wrapperProps = variant === 'secondary' ? { whileTap: { scale: 0.95 } } : {};
 
   return (
     <Wrapper {...wrapperProps}>
