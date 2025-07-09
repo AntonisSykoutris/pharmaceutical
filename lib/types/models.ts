@@ -4,19 +4,18 @@ export type Company = {
   address?: string | null;
   industry?: string | null;
   website?: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export type User = {
   id: string;
-  auth_user_id: string; // maps to Supabase auth.users.id
   first_name?: string | null;
   last_name?: string | null;
   role?: string | null;
   email: string; // Supabase auth.users.email
   company_id?: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
   company?: Company | null; // linked company object
 };

@@ -14,3 +14,80 @@ create trigger update_drug_notes_updated_at
 before update on drug_notes
 for each row
 execute procedure update_updated_at_column();
+
+-- Enable RLS
+alter table drug_notes enable row level security;
+
+-- Policies
+
+-- Allow users to read drug notes linked to drugs of their company
+create policy "Allow users to read drug notes of their company drugs"
+on drug_notes
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from drugs
+    join users on users.company_id = drugs.company_id
+    where drugs.id = drug_notes.drug_id
+    and users.id = auth.uid()
+  )
+);
+
+-- Allow users to insert notes on drugs of their company
+create policy "Allow users to insert notes for drugs of their company"
+on drug_notes
+for insert
+to authenticated
+with check (
+  exists (
+    select 1
+    from drugs
+    join users on users.company_id = drugs.company_id
+    where drugs.id = drug_notes.drug_id
+    and users.id = auth.uid()
+  )
+);
+
+-- Allow users to update their own notes on drugs of their company
+create policy "Allow users to update their own notes for company drugs"
+on drug_notes
+for update
+to authenticated
+using (
+  user_id = auth.uid()
+  and exists (
+    select 1
+    from drugs
+    join users on users.company_id = drugs.company_id
+    where drugs.id = drug_notes.drug_id
+    and users.id = auth.uid()
+  )
+)
+with check (
+  user_id = auth.uid()
+  and exists (
+    select 1
+    from drugs
+    join users on users.company_id = drugs.company_id
+    where drugs.id = drug_notes.drug_id
+    and users.id = auth.uid()
+  )
+);
+
+-- Allow users to delete their own notes on drugs of their company
+create policy "Allow users to delete their own notes for company drugs"
+on drug_notes
+for delete
+to authenticated
+using (
+  user_id = auth.uid()
+  and exists (
+    select 1
+    from drugs
+    join users on users.company_id = drugs.company_id
+    where drugs.id = drug_notes.drug_id
+    and users.id = auth.uid()
+  )
+);

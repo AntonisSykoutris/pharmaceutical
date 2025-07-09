@@ -1,4 +1,5 @@
--- Optional: Create enum for development phases
+drop type if exists development_phase;
+
 create type development_phase as enum (
   'Discovery',
   'Preclinical',
