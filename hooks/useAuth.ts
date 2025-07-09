@@ -1,91 +1,103 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { User } from "@/lib/types/models"; // your User type definition
-import { UseAuthReturn } from "@/lib/types/auth"; // your hook return type
 import { createBrowserClient } from "@supabase/ssr";
+import { User, Company } from "@/lib/types/models";
+import { UseAuthReturn } from "@/lib/types/auth";
 
-// This custom hook manages authentication state, login, signup, logout, and user profile fetching
 export function useAuth(): UseAuthReturn {
-  // Initialise Supabase client on the browser side
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // --- State variables ---
-  const [session, setSession] = useState<any>(null); // Supabase session object
-  const [user, setUser] = useState<User | null>(null); // your User profile
-  const [email, setEmail] = useState(""); // input email field state
-  const [password, setPassword] = useState(""); // input password field state
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // boolean login status
-  const [isLoading, setIsLoading] = useState(true); // loading state for UI
-  const [error, setError] = useState<string | null>(null); // auth error messages
-  const [isSignUpMode, setIsSignUpMode] = useState(false); // toggles login/signup form mode
+  const [session, setSession] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
 
-  // --- Helper function to clear error ---
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
+
   const clearError = () => setError(null);
 
-  // --- Fetch user profile from Supabase 'profiles' table + usage data ---
-  const fetchUserProfile = async (userId: string, userEmail: string) => {
+  // --- Fetch user and company ---
+  const fetchUserAndCompany = async (authUserId: string, userEmail: string) => {
     try {
-      const [profileResponse, usageResponse] = await Promise.all([
-        supabase.from("profiles").select("*").eq("user_id", userId).single(),
-        supabase
-          .from("usage_tracking")
-          .select("tasks_created")
-          .eq("user_id", userId)
-          .eq("year_month", new Date().toISOString().slice(0, 7))
-          .maybeSingle(),
-      ]);
+      // Fetch user entry
+      const userResponse = await supabase
+        .from("users")
+        .select("*")
+        .eq("auth_user_id", authUserId)
+        .single();
 
-      if (profileResponse.error) throw profileResponse.error;
+      if (userResponse.error) throw userResponse.error;
+      const userData = userResponse.data;
 
-      // Merge data into user state
+      // Fetch linked company
+      let companyData = null;
+      if (userData.company_id) {
+        const companyResponse = await supabase
+          .from("companies")
+          .select("*")
+          .eq("id", userData.company_id)
+          .single();
+
+        if (companyResponse.error && companyResponse.error.code !== "PGRST116") {
+          throw companyResponse.error;
+        }
+        companyData = companyResponse.data;
+        setCompany(companyData);
+      }
+
+      // Set user state
       setUser({
-        ...profileResponse.data,
+        ...userData,
         email: userEmail,
-        tasks_created: usageResponse.data?.tasks_created || 0,
+        company: companyData,
       });
+
     } catch (error) {
-      console.error("Critical error fetching user profile:", error);
-      await signOut(); // sign out if profile fetch fails critically
+      console.error("❌ Error fetching user or company:", error);
+      await signOut();
     } finally {
       setIsLoading(false);
     }
   };
 
-  // --- Updates auth session state and fetches user profile if logged in ---
   const updateSessionState = async (newSession: any) => {
     setSession(newSession);
     setIsLoggedIn(!!newSession);
 
     if (newSession?.user) {
       setIsLoading(true);
-      await fetchUserProfile(newSession.user.id, newSession.user.email);
+      await fetchUserAndCompany(newSession.user.id, newSession.user.email);
     } else {
       setUser(null);
+      setCompany(null);
       setIsLoading(false);
     }
   };
 
-  // --- Sign out method ---
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
       setSession(null);
       setUser(null);
+      setCompany(null);
       setIsLoggedIn(false);
       setEmail("");
       setPassword("");
-      window.localStorage.removeItem("supabase.auth.token"); // cleanup localStorage
+      window.localStorage.removeItem("supabase.auth.token");
     } catch (error: any) {
       setError(error.message);
       console.error("Error signing out:", error);
     }
   };
 
-  // --- Handle login with email/password ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -95,20 +107,19 @@ export function useAuth(): UseAuthReturn {
         password,
       });
       if (error) setError(error.message);
-      console.log("✅ User logged in:", email, user);
+      console.log("✅ User logged in:", email);
     } catch (error: any) {
       setError(error.message);
       console.error("Error logging in:", error);
     }
   };
 
-  // --- Handle Google OAuth login ---
   const handleGoogleLogin = async () => {
     try {
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/platform`, // redirect after login
+          redirectTo: `${window.location.origin}/platform`,
         },
       });
     } catch (error: any) {
@@ -117,7 +128,6 @@ export function useAuth(): UseAuthReturn {
     }
   };
 
-  // --- Handle user signup ---
   const handleSignup = async () => {
     clearError();
     try {
@@ -138,7 +148,6 @@ export function useAuth(): UseAuthReturn {
     }
   };
 
-  // --- Initialise auth state on hook mount ---
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -155,20 +164,18 @@ export function useAuth(): UseAuthReturn {
 
     initAuth();
 
-    // Listen to auth state changes (login/logout) and update state accordingly
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       updateSessionState(session);
     });
 
-    // Cleanup subscription on unmount
     return () => subscription.unsubscribe();
   }, []);
 
-  // --- Return states and functions to use in your components ---
   return {
     user,
+    company,
     session,
     email,
     password,

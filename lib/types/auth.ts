@@ -1,4 +1,4 @@
-import { User } from "./models";
+import { User, Company } from "./models";
 
 export interface BaseState {
   isLoading: boolean;
@@ -7,6 +7,7 @@ export interface BaseState {
 
 export interface AuthState extends BaseState {
   user: User | null;
+  company: Company | null; // ✅ added company
   session: any;
   isLoggedIn: boolean;
   email: string;
