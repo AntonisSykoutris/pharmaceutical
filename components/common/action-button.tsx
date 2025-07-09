@@ -35,7 +35,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
   const classes = cn(
     'font-semibold group',
-    variant === 'primary' && '!bg-orange-500 text-white hover:bg-orange-600',
+    variant === 'primary' && ' !bg-primary  text-white hover:bg-orange-600',
     className
   );
 
