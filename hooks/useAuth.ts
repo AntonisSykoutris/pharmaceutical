@@ -148,7 +148,7 @@ export function useAuth(): UseAuthReturn {
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/platform`,
+          redirectTo: `${process.env.NEXT_PUBLIC_SUPABASE_REDIRECT_URL}/platform`,
         },
       });
     } catch (error: any) {
