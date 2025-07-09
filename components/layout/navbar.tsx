@@ -278,9 +278,9 @@ export function Navbar() {
               <DropdownMenuTrigger asChild className='hidden sm:flex'>
                 <Button variant='ghost' className='relative h-9 w-9 rounded-full p-0 hover:bg-white/10'>
                   <Avatar className='h-8 w-8 border-2 border-white/20 hidden sm:flex'>
-                    <AvatarImage src={'/default-avatar.png'} alt={user?.name || 'User avatar'} />
+                    <AvatarImage src={'/default-avatar.png'} alt={user?.email || 'User avatar'} />
                     <AvatarFallback className='bg-gradient-to-br from-primary/80 to-primary text-primary-foreground text-sm font-medium'>
-                      {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+                      {user?.email?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -291,7 +291,7 @@ export function Navbar() {
               >
                 <div className='flex items-center justify-start gap-2 p-2'>
                   <div className='flex flex-col space-y-1 leading-none'>
-                    {user?.name && <p className='font-medium text-sm'>{user.name}</p>}
+                    {user?.email && <p className='font-medium text-sm'>{user.first_name}</p>}
                     {user?.email && <p className='text-xs text-muted-foreground'>{user.email}</p>}
                   </div>
                 </div>
@@ -337,13 +337,13 @@ export function Navbar() {
               {isLoggedIn && (
                 <div className='flex items-center space-x-3 py-4 border-b border-white/20'>
                   <Avatar className='h-10 w-10 border-2 border-white/20'>
-                    <AvatarImage src={'/default-avatar.png'} alt={user?.name || 'User avatar'} />
+                    <AvatarImage src={'/default-avatar.png'} alt={user?.email || 'User avatar'} />
                     <AvatarFallback className='bg-gradient-to-br from-primary/80 to-primary text-primary-foreground'>
-                      {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+                      {user?.email?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className='flex flex-col'>
-                    {user?.name && <p className='font-medium text-sm'>{user.name}</p>}
+                    {user?.email && <p className='font-medium text-sm'>{user.first_name}</p>}
                     {user?.email && <p className='text-xs text-muted-foreground'>{user.email}</p>}
                   </div>
                 </div>
