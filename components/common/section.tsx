@@ -11,7 +11,7 @@ type SectionProps = {
 
 const Section: React.FC<SectionProps> = ({ id, children, className, showGradient = false, gradientClassName }) => {
   return (
-    <section id={id} className={cn('container py-24 sm:py-32 relative', className)}>
+    <section id={id} className={cn('container py-24 sm:py-32 relative z-10 bg-background', className)}>
       {showGradient && (
         <div className='absolute -z-10 inset-0 overflow-hidden flex justify-center'>
           <div

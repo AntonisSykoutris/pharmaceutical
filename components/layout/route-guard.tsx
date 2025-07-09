@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const PUBLIC_ROUTES = ['/', '/signIn']; // Define your public routes here
+const PUBLIC_ROUTES = ['/', '/signIn', '/signUp']; // Define your public routes here
 const DEFAULT_AUTHENTICATED_ROUTE = '/platform'; // Where to send logged in users from public routes
 const DEFAULT_PUBLIC_ROUTE = '/signIn'; // Sign in page
 
@@ -20,7 +20,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
     // If logged in and on a public route (e.g. sign in page), redirect to platform/dashboard
-    if (isLoggedIn && isPublicRoute) {
+    if (isLoggedIn && isPublicRoute && pathname !== '/') {
       router.replace(DEFAULT_AUTHENTICATED_ROUTE);
       setIsReady(false); // prevent rendering children while redirecting
     }

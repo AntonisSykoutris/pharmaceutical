@@ -1,11 +1,15 @@
 'use client';
 
-import * as React from 'react';
-import Link from 'next/link';
-import { Menu, ChevronDown, Instagram, Linkedin, Mail, User, Settings, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -15,18 +19,14 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-import { ToggleTheme } from './toogle-theme';
 import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown, Instagram, Linkedin, LogOut, Mail, Menu, Settings, User } from 'lucide-react';
+import Link from 'next/link';
+import * as React from 'react';
 import ActionButton from '../common/action-button';
+import { ToggleTheme } from './toogle-theme';
 
 const navigationItems = [
   {
@@ -231,11 +231,14 @@ export function Navbar() {
                     </NavigationMenuContent>
                   </>
                 ) : (
-                  <Link href={item.href} legacyBehavior passHref>
-                    <NavigationMenuLink className='group inline-flex h-10 w-max items-center justify-center rounded-md bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm font-medium transition-all duration-200 hover:text-accent-foreground focus:bg-white/10 focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50'>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href={item.href}
+                      className='group inline-flex h-10 w-max items-center justify-center rounded-md bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm font-medium transition-all duration-200 hover:text-accent-foreground focus:bg-white/10 focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50'
+                    >
                       {item.title}
-                    </NavigationMenuLink>
-                  </Link>
+                    </Link>
+                  </NavigationMenuLink>
                 )}
               </NavigationMenuItem>
             ))}
@@ -267,17 +270,12 @@ export function Navbar() {
 
           {/* Auth Section */}
           {!isLoggedIn ? (
-            <div className='flex items-center space-x-2'>
-              <Button asChild variant='outline' size='sm' className='hidden sm:flex'>
-                <Link href='/signIn'>Sign In</Link>
-              </Button>
-              <Button asChild size='sm' className='hidden sm:flex'>
-                <Link href='/signUp'>Get Started</Link>
-              </Button>
-            </div>
+            <Button asChild size='sm' className='hidden sm:flex'>
+              <Link href='/signIn'>Get Started</Link>
+            </Button>
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className='hidden sm:flex'>
                 <Button variant='ghost' className='relative h-9 w-9 rounded-full p-0 hover:bg-white/10'>
                   <Avatar className='h-8 w-8 border-2 border-white/20 hidden sm:flex'>
                     <AvatarImage src={'/default-avatar.png'} alt={user?.name || 'User avatar'} />
@@ -378,7 +376,7 @@ export function Navbar() {
                     >
                       <button
                         onClick={signOut}
-                        className='block w-full text-left px-4 py-3 text-lg font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg transition-all duration-200 backdrop-blur-sm border border-red-500/20'
+                        className='block w-full text-left px-4 py-3 text-lg font-medium bg-destructive hover:bg-destructive/90 hover:text-destructive-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-bg-destructive/20'
                       >
                         Sign Out
                       </button>
@@ -389,8 +387,7 @@ export function Navbar() {
 
               {!isLoggedIn && (
                 <div className='mt-6 space-y-3'>
-                  <ActionButton className='w-full' name='Sign In' href='/signIn' variant='secondary' />
-                  <ActionButton className='w-full' name='Get Started' href='/signUp' variant='primary' />
+                  <ActionButton className='w-full' name='Get Started' href='/signIn' variant='primary' />
                 </div>
               )}
 

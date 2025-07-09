@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Navbar } from '@/components/layout/navbar';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import { RouteGuard } from '@/components/layout/route-guard';
+import CanvasCursor from '@/components/layout/canvas-cursor';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -23,6 +24,8 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background', inter.className)}>
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
           <Navbar />
+          <CanvasCursor />
+
           <RouteGuard>{children}</RouteGuard>
         </ThemeProvider>
       </body>

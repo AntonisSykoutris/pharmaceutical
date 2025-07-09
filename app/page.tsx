@@ -44,7 +44,6 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <CanvasCursor />
       <HeroSection />
       <SponsorsSection />
       <BenefitsSection />
