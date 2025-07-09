@@ -114,7 +114,7 @@ function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; ind
       >
         <Link
           href={item.href}
-          className='block px-4 py-3 text-lg font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10'
+          className='block px-2 py-2 text-md font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10'
         >
           {item.title}
         </Link>
@@ -129,7 +129,7 @@ function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; ind
       transition={{ duration: 0.3, delay: index * 0.1 }}
     >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className='flex w-full items-center justify-between px-4 py-3 text-lg font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10'>
+        <CollapsibleTrigger className='flex w-full items-center justify-between px-2 py-2 text-md font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10'>
           {item.title}
           <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3, ease: 'easeInOut' }}>
             <ChevronDown className='h-4 w-4' />

@@ -65,7 +65,7 @@ export const HeroSection = () => {
         </motion.p>
 
         {/* Buttons */}
-        <motion.div className='flex sm:flex-row gap-4 mt-10 justify-center' variants={fadeInUp}>
+        <motion.div className='flex max-sm:flex-col sm:flex-row gap-4 mt-10 justify-center' variants={fadeInUp}>
           <ActionButton name='Book a Demo' onClick={() => console.log('Demo booked')} variant='primary' />
           <ActionButton name='Talk to an Expert' href='/contact' variant='secondary' />
         </motion.div>
