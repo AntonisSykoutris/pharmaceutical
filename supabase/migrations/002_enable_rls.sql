@@ -1,0 +1,2 @@
+-- No table here, just an init placeholder for order consistency
+-- RLS is enabled per-table below;
