@@ -1,19 +1,18 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { Session } from "@supabase/supabase-js";
+import { Session, User as SupabaseAuthUser } from "@supabase/supabase-js";
+// Ensure this exists, or adjust accordingly
 import { User, Company } from "@/lib/types/models";
 import { UseAuthReturn } from "@/lib/types/auth";
-import { Database } from "@/lib/database.types";
+import { Database } from "@/lib/types/supabase";
 
 export function useAuth(): UseAuthReturn {
   const supabase = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-
-  // ------------------ STATE ------------------
 
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -25,78 +24,86 @@ export function useAuth(): UseAuthReturn {
   const [error, setError] = useState<string | null>(null);
   const [isSignUpMode, setIsSignUpMode] = useState<boolean>(false);
 
-  // ------------------ HELPERS ------------------
-
   const clearError = () => setError(null);
 
-  /**
-   * Fetches user from DB or creates it if it does not exist
-   * Also fetches associated company
-   */
-const fetchOrCreateUser = async (authUserId: string, userEmail: string) => {
-  try {
-    console.log("Fetching user by auth_user_id", authUserId);
-
-    let { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("auth_user_id", authUserId)
-      .single();
-
-    if (userError) {
-      console.log("User fetch error", userError);
-
-      if (userError.code === "PGRST116") {
-        console.log("No user found, inserting new user");
-
-        const { data: insertData, error: insertErr } = await supabase
+  const fetchUserAndCompany = async (authUserId: string, userEmail: string) => {
+    try {
+      // Attempt to fetch the row
+      let { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", authUserId)
+        .single();
+  
+      // If no row found, insert (or upsert) then refetch
+      if (userError?.code === "PGRST116") {
+        const { error: insertErr } = await supabase
           .from("users")
-          .insert({
-            auth_user_id: authUserId,
-            email: userEmail,
-          })
-          .select("*")
+          .insert({ id: authUserId })
+          .select()             // returns the inserted row
           .single();
-
-        if (insertErr) {
-          console.error("Insert user error", insertErr);
-          throw insertErr;
-        }
-
-        userData = insertData;
-      } else {
+  
+        // Ignore unique‑constraint errors (23505)
+        if (insertErr && insertErr.code !== "23505") throw insertErr;
+  
+        // Refetch after insert/duplicate
+        const { data, error: refetchErr } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", authUserId)
+          .single();
+        if (refetchErr) throw refetchErr;
+        userData = data;
+      } else if (userError) {
         throw userError;
       }
+  
+      // Fetch linked company (same as before)
+      let companyData: Company | null = null;
+      if (userData?.company_id) {
+        const { data: companyRes, error: companyErr } = await supabase
+          .from("companies")
+          .select("*")
+          .eq("id", userData.company_id)
+          .single();
+        if (companyErr && companyErr.code !== "PGRST116") throw companyErr;
+        companyData = companyRes ?? null;
+      }
+
+      setUser({
+        id:             userData?.id!,                       // assert non‑null
+        role:           userData?.role       ?? null,
+        email:          userEmail,                          // comes from session
+        company_id:     userData?.company_id ?? null,
+        created_at:     userData?.created_at!,               // assert non‑null
+        updated_at:     userData?.updated_at!,               // assert non‑null
+        company:        companyData                         // matches Company|null
+      });
+  
+      setCompany(companyData);
+  
+    } catch (err: any) {
+      console.error("❌ Error fetching user or company:", err);
+      await signOut();
+    } finally {
+      setIsLoading(false);
     }
+  };
+  
 
-    // Continue with company fetch logic...
-  } catch (err: any) {
-    console.error("❌ Error fetching or inserting user", err);
-    await signOut();
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
-  /**
-   * Updates session state and fetches user/company accordingly
-   */
   const updateSessionState = async (newSession: Session | null) => {
     setSession(newSession);
     setIsLoggedIn(!!newSession);
 
     if (newSession?.user) {
       setIsLoading(true);
-      await fetchOrCreateUser(newSession.user.id, newSession.user.email!);
+      await fetchUserAndCompany(newSession.user.id, newSession.user.email!);
     } else {
       setUser(null);
       setCompany(null);
       setIsLoading(false);
     }
   };
-
-  // ------------------ AUTH ACTIONS ------------------
 
   const signOut = async () => {
     try {
@@ -123,8 +130,11 @@ const fetchOrCreateUser = async (authUserId: string, userEmail: string) => {
         email,
         password,
       });
-      if (error) setError(error.message);
-      else console.log("✅ User logged in:", data.user?.email);
+      if (error) {
+        setError(error.message);
+      } else {
+        console.log("✅ User logged in:", data.user?.email);
+      }
     } catch (error: any) {
       setError(error.message);
       console.error("Error logging in:", error);
@@ -171,8 +181,6 @@ const fetchOrCreateUser = async (authUserId: string, userEmail: string) => {
     }
   };
 
-  // ------------------ INIT + SUBSCRIPTIONS ------------------
-
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -195,8 +203,6 @@ const fetchOrCreateUser = async (authUserId: string, userEmail: string) => {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  // ------------------ RETURN ------------------
 
   return {
     user,

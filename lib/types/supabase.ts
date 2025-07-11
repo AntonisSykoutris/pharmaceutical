@@ -7,6 +7,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
@@ -285,6 +287,7 @@ export type Database = {
         | "Approved"
         | "Discontinued"
       drug_status: "Active" | "On hold" | "Discontinued" | "Approved"
+      user_role: "user" | "admin" | "owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -422,6 +425,7 @@ export const Constants = {
         "Discontinued",
       ],
       drug_status: ["Active", "On hold", "Discontinued", "Approved"],
+      user_role: ["user", "admin", "owner"],
     },
   },
 } as const
