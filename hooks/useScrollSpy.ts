@@ -14,7 +14,7 @@ const useScrollSpy = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
 
-      sections.forEach((current) => {
+      sections.forEach(current => {
         const sectionHeight = current.offsetHeight;
         const sectionTop = current.offsetTop - windowHeight / 2;
         const sectionId = current.getAttribute('id');
@@ -32,7 +32,7 @@ const useScrollSpy = () => {
     window.addEventListener('scroll', handleScroll);
 
     // Prevent context menu from opening
-    window.addEventListener('contextmenu', (event) => {
+    window.addEventListener('contextmenu', event => {
       event.preventDefault();
     });
 

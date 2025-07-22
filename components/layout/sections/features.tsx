@@ -2,11 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
-import { icons } from 'lucide-react';
+import type { Easing, Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
-import type { Variants, Easing } from 'framer-motion';
-import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern';
-import { cn } from '@/lib/utils';
+import { icons } from 'lucide-react';
 
 interface FeaturesProps {
   icon: string;

@@ -19,7 +19,6 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Instagram, Linkedin, LogOut, Mail, Menu, Settings, User } from 'lucide-react';
@@ -27,6 +26,9 @@ import Link from 'next/link';
 import * as React from 'react';
 import ActionButton from '../common/action-button';
 import { ToggleTheme } from './toogle-theme';
+import { createClient } from '@/lib/supabase/client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const navigationItems = [
   {
@@ -187,8 +189,70 @@ function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; ind
 }
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const { isLoggedIn, signOut, user } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [claims, setClaims] = useState<{
+    iss: string;
+    sub: string;
+    aud: string;
+    exp: number;
+    iat: number;
+    email: string;
+    phone: string;
+    app_metadata: {
+      provider: string;
+      providers: string[];
+    };
+    user_metadata: {
+      email: string;
+      email_verified: boolean;
+      phone_verified: boolean;
+      sub: string;
+    };
+    role: string;
+    aal: string;
+    amr: {
+      method: string;
+      timestamp: number;
+    }[];
+    session_id: string;
+    is_anonymous: boolean;
+  } | null>(null);
+
+  const router = useRouter();
+
+  const logout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/auth/login');
+  };
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        setClaims(null);
+      } else {
+        // Re-fetch claims if user signed in
+        supabase.auth.getClaims().then(({ data, error }) => {
+          if (!error) setClaims(data?.claims as typeof claims);
+        });
+      }
+    });
+
+    // Initial fetch
+    const getClaims = async () => {
+      const { data, error } = await supabase.auth.getClaims();
+      if (!error) {
+        setClaims(data?.claims as typeof claims);
+      }
+    };
+    getClaims();
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <header className='sticky top-0 z-[50] w-full border-b border-white/20 bg-white/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/10 shadow-lg'>
@@ -217,7 +281,7 @@ export function Navbar() {
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
                       <div className='bg-background backdrop-blur-xl border border-white/20 rounded-lg shadow-2xl overflow-hidden'>
-                        <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] overflow-visible'>
+                        <ul className='grid w-[400px] gap-3 md:w-[500px] md:grid-cols-2 lg:w-[600px] overflow-visible'>
                           {item.items.map(subItem => (
                             <ListItem
                               key={subItem.title}
@@ -234,7 +298,7 @@ export function Navbar() {
                   <NavigationMenuLink asChild>
                     <Link
                       href={item.href}
-                      className='group inline-flex h-10 w-max items-center justify-center rounded-md bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm font-medium transition-all duration-200 hover:text-accent-foreground focus:bg-white/10 focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50'
+                      className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm font-medium transition-all duration-200 hover:text-accent-foreground focus:bg-white/10 focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50'
                     >
                       {item.title}
                     </Link>
@@ -269,7 +333,7 @@ export function Navbar() {
           </div>
 
           {/* Auth Section */}
-          {!isLoggedIn ? (
+          {!claims ? (
             <Button asChild size='sm' className='hidden sm:flex'>
               <Link href='/signIn'>Get Started</Link>
             </Button>
@@ -278,9 +342,9 @@ export function Navbar() {
               <DropdownMenuTrigger asChild className='hidden sm:flex'>
                 <Button variant='ghost' className='relative h-9 w-9 rounded-full p-0 hover:bg-white/10'>
                   <Avatar className='h-8 w-8 border-2 border-white/20 hidden sm:flex'>
-                    <AvatarImage src={'/default-avatar.png'} alt={user?.email || 'User avatar'} />
+                    <AvatarImage src={'/default-avatar.png'} alt={claims?.email || 'User avatar'} />
                     <AvatarFallback className='bg-gradient-to-br from-primary/80 to-primary text-primary-foreground text-sm font-medium'>
-                      {user?.email?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+                      {claims?.email?.[0]?.toUpperCase() || claims?.email?.[0]?.toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -291,8 +355,8 @@ export function Navbar() {
               >
                 <div className='flex items-center justify-start gap-2 p-2'>
                   <div className='flex flex-col space-y-1 leading-none'>
-                    {user?.email && <p className='font-medium text-sm'>{user.first_name}</p>}
-                    {user?.email && <p className='text-xs text-muted-foreground'>{user.email}</p>}
+                    {claims?.email && <p className='font-medium text-sm'>{claims.role}</p>}
+                    {claims?.email && <p className='text-xs text-muted-foreground'>{claims.email}</p>}
                   </div>
                 </div>
                 <DropdownMenuSeparator className='bg-white/20' />
@@ -309,7 +373,7 @@ export function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className='bg-white/20' />
-                <DropdownMenuItem onClick={signOut} className='flex items-center text-red-400 hover:text-red-300'>
+                <DropdownMenuItem onClick={logout} className='flex items-center text-red-400 hover:text-red-300'>
                   <LogOut className='mr-2 h-4 w-4' />
                   Sign Out
                 </DropdownMenuItem>
@@ -334,28 +398,28 @@ export function Navbar() {
               </SheetHeader>
 
               {/* Mobile Auth Section */}
-              {isLoggedIn && (
-                <div className='flex items-center space-x-3 py-4 border-b border-white/20'>
+              {claims && (
+                <div className='flex px-2 items-center space-x-3 py-4 pt-0 border-b border-white/20'>
                   <Avatar className='h-10 w-10 border-2 border-white/20'>
-                    <AvatarImage src={'/default-avatar.png'} alt={user?.email || 'User avatar'} />
+                    <AvatarImage src={'/default-avatar.png'} alt={claims?.email || 'User avatar'} />
                     <AvatarFallback className='bg-gradient-to-br from-primary/80 to-primary text-primary-foreground'>
-                      {user?.email?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+                      {claims?.email?.[0]?.toUpperCase() || claims?.email?.[0]?.toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className='flex flex-col'>
-                    {user?.email && <p className='font-medium text-sm'>{user.first_name}</p>}
-                    {user?.email && <p className='text-xs text-muted-foreground'>{user.email}</p>}
+                    {claims?.email && <p className='font-medium text-sm'>{claims.role}</p>}
+                    {claims?.email && <p className='text-xs text-muted-foreground'>{claims.email}</p>}
                   </div>
                 </div>
               )}
 
               {/* Navigation Links */}
-              <nav className='flex flex-col space-y-3 mt-6'>
+              <nav className='flex flex-col space-y-3 px-2'>
                 {navigationItems.map((item, index) => (
                   <MobileNavItem key={item.title} item={item} index={index} />
                 ))}
 
-                {isLoggedIn && (
+                {claims && (
                   <>
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
@@ -364,7 +428,7 @@ export function Navbar() {
                     >
                       <Link
                         href='/settings'
-                        className='block px-4 py-3 text-lg font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10'
+                        className='block px-2 py-2 text-md font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10'
                       >
                         Settings
                       </Link>
@@ -375,8 +439,8 @@ export function Navbar() {
                       transition={{ duration: 0.3, delay: (navigationItems.length + 1) * 0.1 }}
                     >
                       <button
-                        onClick={signOut}
-                        className='block w-full text-left px-4 py-3 text-lg font-medium bg-destructive hover:bg-destructive/90 hover:text-destructive-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-bg-destructive/20'
+                        onClick={logout}
+                        className='block w-full text-left px-2 py-2 text-md font-medium bg-destructive hover:bg-destructive/90 hover:text-destructive-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-bg-destructive/20'
                       >
                         Sign Out
                       </button>
@@ -385,14 +449,14 @@ export function Navbar() {
                 )}
               </nav>
 
-              {!isLoggedIn && (
-                <div className='mt-6 space-y-3'>
+              {!claims && (
+                <div className=' space-y-3'>
                   <ActionButton className='w-full' name='Get Started' href='/signIn' variant='primary' />
                 </div>
               )}
 
               {/* Mobile Social Icons & Theme Toggle */}
-              <div className='mt-6 pt-6 border-t border-white/20'>
+              <div className='pt-1 border-t border-white/20'>
                 <div className='flex items-center'>
                   <div className='flex items-center space-x-2'>
                     <Button size='sm' variant='ghost' className='h-9 w-9 p-0'>

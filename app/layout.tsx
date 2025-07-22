@@ -1,18 +1,22 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { cn } from '@/lib/utils';
-import { Navbar } from '@/components/layout/navbar';
-import { ThemeProvider } from '@/components/layout/theme-provider';
-import { RouteGuard } from '@/components/layout/route-guard';
 import CanvasCursor from '@/components/layout/canvas-cursor';
-const inter = Inter({ subsets: ['latin'] });
+import { Navbar } from '@/components/layout/navbar';
+import type { Metadata } from 'next';
+import { ThemeProvider } from 'next-themes';
+import './globals.css';
+
+const defaultUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
 
 export const metadata: Metadata = {
-  title: 'PharmaFlow – Automate Pharmaceutical Paperwork',
-  description:
-    'Streamline regulatory, compliance, and documentation workflows in the pharmaceutical industry with PharmaFlow.',
+  metadataBase: new URL(defaultUrl),
+  title: 'Next.js and Supabase Starter Kit',
+  description: 'The fastest way to build apps with Next.js and Supabase',
 };
+
+// const geistSans = Geist({
+//   variable: '--font-geist-sans',
+//   display: 'swap',
+//   subsets: ['latin'],
+// });
 
 export default function RootLayout({
   children,
@@ -20,13 +24,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='pt-br' suppressHydrationWarning>
-      <body className={cn('min-h-screen bg-background', inter.className)}>
+    <html lang='en' suppressHydrationWarning>
+      <body className={` antialiased`}>
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-          <Navbar />
           <CanvasCursor />
-
-          <RouteGuard>{children}</RouteGuard>
+          <Navbar />
+          <main className='container max-w-[90%] mx-auto'>{children}</main>
         </ThemeProvider>
       </body>
     </html>

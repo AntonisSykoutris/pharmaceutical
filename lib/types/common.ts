@@ -1,16 +1,27 @@
-export type NavDataType = {
-  text: string;
-  path: string;
-};
-
-export type Section = {
-  positionId: number;
-  title: string;
-};
-
-export type SectionContextType = {
-  activeSection: number;
-  setActiveSection: (_: number) => void;
-  activeSectionProgress: number;
-  setActiveSectionProgress: (_: number) => void;
+export type Claims = {
+  iss: string;
+  sub: string;
+  aud: string;
+  exp: number;
+  iat: number;
+  email: string;
+  phone: string;
+  app_metadata: {
+    provider: string;
+    providers: string[];
+  };
+  user_metadata: {
+    email: string;
+    email_verified: boolean;
+    phone_verified: boolean;
+    sub: string;
+  };
+  role: string;
+  aal: string;
+  amr: {
+    method: string;
+    timestamp: number;
+  }[];
+  session_id: string;
+  is_anonymous: boolean;
 };

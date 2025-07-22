@@ -1,15 +1,10 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import Link from 'next/link';
-import { fadeInUp } from '@/lib/motion';
-import useMobileCheck from '@/hooks/useMobileCheck';
 import ActionButton from '@/components/common/action-button';
+import { fadeInUp } from '@/lib/motion';
+import { motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
+import Image from 'next/image';
 
 const containerVariants = {
   hidden: {},
@@ -22,7 +17,6 @@ const containerVariants = {
 
 export const HeroSection = () => {
   const { theme } = useTheme();
-  const isMobile = useMobileCheck();
   return (
     <section className='container w-full py-24 md:py-36 bg-background'>
       {/* Glow background */}
