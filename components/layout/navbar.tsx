@@ -104,8 +104,17 @@ const ListItem = React.forwardRef<
 });
 ListItem.displayName = 'ListItem';
 
-function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; index: number }) {
+function MobileNavItem({
+  item,
+  index,
+  setIsMenuOpen,
+}: {
+  item: (typeof navigationItems)[0];
+  index: number;
+  setIsMenuOpen: (open: boolean) => void;
+}) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const router = useRouter();
 
   if (!item.items) {
     return (
@@ -114,12 +123,16 @@ function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; ind
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3, delay: index * 0.1 }}
       >
-        <Link
-          href={item.href}
-          className='block px-2 py-2 text-md font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10'
+        <button
+          className='block px-2 py-2 text-md font-medium text-foreground hover:bg-white/10 hover:text-accent-foreground rounded-lg transition-all duration-200 backdrop-blur-sm border border-white/10 w-full text-left'
+          onClick={e => {
+            e.preventDefault();
+            setIsMenuOpen(false);
+            router.push(item.href);
+          }}
         >
-          {item.title}
-        </Link>
+          {item.title} ff
+        </button>
       </motion.div>
     );
   }
@@ -170,12 +183,16 @@ function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; ind
                       }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Link
-                        href={subItem.href}
-                        className='block px-4 py-2 text-base text-muted-foreground hover:bg-white/5 hover:text-accent-foreground rounded-md transition-all duration-200 backdrop-blur-sm border border-white/5'
+                      <button
+                        className='block px-4 py-2 text-base text-muted-foreground hover:bg-white/5 hover:text-accent-foreground rounded-md transition-all duration-200 backdrop-blur-sm border border-white/5 w-full text-left'
+                        onClick={e => {
+                          e.preventDefault();
+                          setIsMenuOpen(false);
+                          router.push(subItem.href);
+                        }}
                       >
                         {subItem.title}
-                      </Link>
+                      </button>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -189,7 +206,7 @@ function MobileNavItem({ item, index }: { item: (typeof navigationItems)[0]; ind
 }
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [claims, setClaims] = useState<{
     iss: string;
     sub: string;
@@ -256,7 +273,7 @@ export function Navbar() {
 
   return (
     <header className='sticky top-0 z-[50] w-full border-b border-white/20 bg-white/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/10 shadow-lg'>
-      <div className='container flex h-16 items-center'>
+      <div className='container flex h-16 items-center md:px-2'>
         {/* Logo */}
         <Link href='/' className='flex items-center space-x-2 mr-6'>
           <motion.div
@@ -382,7 +399,7 @@ export function Navbar() {
           )}
 
           {/* Mobile Navigation Trigger */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild className='lg:hidden'>
               <Button variant='ghost' size='icon' className='h-9 w-9'>
                 <Menu className='h-5 w-5' />
@@ -416,7 +433,7 @@ export function Navbar() {
               {/* Navigation Links */}
               <nav className='flex flex-col space-y-3 px-2'>
                 {navigationItems.map((item, index) => (
-                  <MobileNavItem key={item.title} item={item} index={index} />
+                  <MobileNavItem setIsMenuOpen={setIsMenuOpen} key={item.title} item={item} index={index} />
                 ))}
 
                 {claims && (
