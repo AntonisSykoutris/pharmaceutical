@@ -131,7 +131,7 @@ function MobileNavItem({
             router.push(item.href);
           }}
         >
-          {item.title} ff
+          {item.title}
         </button>
       </motion.div>
     );
@@ -467,8 +467,13 @@ export function Navbar() {
               </nav>
 
               {!claims && (
-                <div className=' space-y-3'>
-                  <ActionButton className='w-full' name='Get Started' href='/signIn' variant='primary' />
+                <div className='space-y-3 px-2'>
+                  <ActionButton
+                    className='w-full justify-start px-2'
+                    name='Get Started'
+                    href='/signIn'
+                    variant='primary'
+                  />
                 </div>
               )}
 
