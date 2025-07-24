@@ -352,10 +352,10 @@ export function Navbar() {
           {/* Auth Section */}
           {!claims ? (
             <Button asChild size='sm' className='hidden sm:flex'>
-              <Link href='/signIn'>Get Started</Link>
+              <Link href='/auth/login'>Get Started</Link>
             </Button>
           ) : (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild className='hidden sm:flex'>
                 <Button variant='ghost' className='relative h-9 w-9 rounded-full p-0 hover:bg-white/10'>
                   <Avatar className='h-8 w-8 border-2 border-white/20 hidden sm:flex'>
@@ -471,8 +471,11 @@ export function Navbar() {
                   <ActionButton
                     className='w-full justify-start px-2'
                     name='Get Started'
-                    href='/signIn'
                     variant='primary'
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      router.push('/auth/login');
+                    }}
                   />
                 </div>
               )}

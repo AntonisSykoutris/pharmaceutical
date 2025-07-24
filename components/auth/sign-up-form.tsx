@@ -38,9 +38,6 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           emailRedirectTo: `${window.location.origin}/protected`,
         },
       });
-      console.log('Sign up error:', error);
-      console.log('Sign up email:', email);
-      console.log('Sign up password:', password);
       if (error) throw error;
       router.push('/auth/sign-up-success');
     } catch (error: unknown) {
