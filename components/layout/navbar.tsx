@@ -273,7 +273,7 @@ export function Navbar() {
 
   return (
     <header className='sticky top-0 z-[50] w-full border-b border-white/20 bg-white/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/10 shadow-lg'>
-      <div className='container flex h-16 items-center md:px-2'>
+      <div className='container flex h-16 items-center px-2'>
         {/* Logo */}
         <Link href='/' className='flex items-center space-x-2 mr-6'>
           <motion.div
@@ -494,7 +494,7 @@ export function Navbar() {
                       <Mail className='h-4 w-4' />
                     </Button>
                   </div>
-                  <ToggleTheme />
+                  <ToggleTheme className=' w-fit' />
                 </div>
               </div>
             </SheetContent>

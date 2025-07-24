@@ -1,15 +1,20 @@
 import { useTheme } from 'next-themes';
 import { Button } from '../ui/button';
 import { Moon, Sun } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export const ToggleTheme = () => {
+type ToggleThemeProps = {
+  className?: string;
+};
+
+export const ToggleTheme = ({ className }: ToggleThemeProps) => {
   const { theme, setTheme } = useTheme();
   return (
     <Button
       onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
       size='sm'
       variant='ghost'
-      className='w-full justify-start'
+      className={cn('w-full justify-start', className)}
     >
       <div className='flex gap-2 dark:hidden'>
         <Moon className='size-5' />
