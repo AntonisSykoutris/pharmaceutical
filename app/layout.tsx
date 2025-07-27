@@ -29,7 +29,7 @@ export default function RootLayout({
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
           <CanvasCursor />
           <Navbar />
-          <main className='container max-w-[90%] mx-auto'>{children}</main>
+          <main className='container max-w-[90%] 2xl:max-w-[60%] mx-auto'>{children}</main>
         </ThemeProvider>
       </body>
     </html>

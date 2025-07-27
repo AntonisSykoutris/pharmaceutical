@@ -1,3 +1,4 @@
+import Section from '@/components/common/section';
 import GithubIcon from '@/components/icons/github-icon';
 import LinkedInIcon from '@/components/icons/linkedin-icon';
 import XIcon from '@/components/icons/x-icon';
@@ -78,7 +79,7 @@ export const TeamSection = () => {
   };
 
   return (
-    <section id='team' className='py-24 sm:py-32'>
+    <Section id='team'>
       <div className='text-center mb-8'>
         <h2 className='text-lg text-primary text-center mb-2 tracking-wider'>Team</h2>
 
@@ -123,6 +124,6 @@ export const TeamSection = () => {
           </Card>
         ))}
       </div>
-    </section>
+    </Section>
   );
 };

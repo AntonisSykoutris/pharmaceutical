@@ -1,5 +1,6 @@
 'use client';
 
+import Section from '@/components/common/section';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import type { Easing, Variants } from 'framer-motion';
@@ -68,7 +69,7 @@ const cardVariants: Variants = {
 
 export const FeaturesSection = () => {
   return (
-    <section id='features' className='container py-24 sm:py-32 relative'>
+    <Section id='features'>
       <motion.div
         initial='hidden'
         whileInView='show'
@@ -122,6 +123,6 @@ export const FeaturesSection = () => {
           </motion.div>
         ))}
       </motion.div>
-    </section>
+    </Section>
   );
 };

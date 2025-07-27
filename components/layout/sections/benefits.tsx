@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@/components/ui/icon';
 import { icons } from 'lucide-react';
 import { Easing, motion, Variants } from 'framer-motion';
+import Section from '@/components/common/section';
 
 interface BenefitsProps {
   icon: string;
@@ -61,7 +62,7 @@ const cardVariants: Variants = {
 
 export const BenefitsSection = () => {
   return (
-    <section id='benefits' className='container py-24 sm:py-32'>
+    <Section id='benefits'>
       <motion.div
         className='grid lg:grid-cols-2 place-items-center lg:gap-24'
         initial='hidden'
@@ -109,6 +110,6 @@ export const BenefitsSection = () => {
           ))}
         </motion.div>
       </motion.div>
-    </section>
+    </Section>
   );
 };

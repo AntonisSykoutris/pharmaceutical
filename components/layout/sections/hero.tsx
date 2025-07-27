@@ -1,6 +1,7 @@
 'use client';
 
 import ActionButton from '@/components/common/action-button';
+import Section from '@/components/common/section';
 import { fadeInUp } from '@/lib/motion';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -18,12 +19,7 @@ const containerVariants = {
 export const HeroSection = () => {
   const { theme } = useTheme();
   return (
-    <section className='container w-full py-24 md:py-36 bg-background'>
-      {/* Glow background */}
-      <div className='absolute -z-10 inset-0 overflow-hidden flex justify-center'>
-        <div className='w-[600px] h-[600px] bg-gradient-to-r from-[#D247BF] to-primary opacity-30 blur-3xl rounded-full mt-20' />
-      </div>
-
+    <Section className='' showGradient>
       <motion.div
         className='container mx-auto flex flex-col items-center text-center px-4'
         variants={containerVariants}
@@ -81,6 +77,6 @@ export const HeroSection = () => {
           />
         </motion.div>
       </motion.div>
-    </section>
+    </Section>
   );
 };

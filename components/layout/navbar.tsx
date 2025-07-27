@@ -273,61 +273,64 @@ export function Navbar() {
 
   return (
     <header className='sticky top-0 z-[50] w-full border-b border-white/20 bg-white/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/10 shadow-lg'>
-      <div className='container flex h-16 items-center px-2'>
-        {/* Logo */}
-        <Link href='/' className='flex items-center space-x-2 mr-6'>
-          <motion.div
-            className='h-8 w-8 rounded-lg bg-gradient-to-br from-primary/80 to-primary backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-lg'
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className='text-primary-foreground font-bold text-sm'>L</span>
-          </motion.div>
-          <span className='font-bold text-xl bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text'>Logo</span>
-        </Link>
+      <div className='container mx-auto px-2 flex h-16 items-center'>
+        <div className='mr-4 md:flex'>
+          <Link href='/' className='flex items-center space-x-2 mr-6'>
+            <motion.div
+              className='h-8 w-8 rounded-lg bg-gradient-to-br from-primary/80 to-primary backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-lg'
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className='text-primary-foreground font-bold text-sm'>L</span>
+            </motion.div>
+            <span className='font-bold text-xl bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text'>
+              Logo
+            </span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <NavigationMenu className='hidden lg:flex flex-1'>
-          <NavigationMenuList>
-            {navigationItems.map(item => (
-              <NavigationMenuItem key={item.title}>
-                {item.items ? (
-                  <>
-                    <NavigationMenuTrigger className='text-sm font-medium bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 transition-all duration-200'>
-                      {item.title}
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <div className='bg-background backdrop-blur-xl border border-white/20 rounded-lg shadow-2xl overflow-hidden'>
-                        <ul className='grid w-[400px] gap-3 md:w-[500px] md:grid-cols-2 lg:w-[600px] overflow-visible'>
-                          {item.items.map(subItem => (
-                            <ListItem
-                              key={subItem.title}
-                              title={subItem.title}
-                              description={subItem.description}
-                              href={subItem.href}
-                            />
-                          ))}
-                        </ul>
-                      </div>
-                    </NavigationMenuContent>
-                  </>
-                ) : (
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href={item.href}
-                      className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm font-medium transition-all duration-200 hover:text-accent-foreground focus:bg-white/10 focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50'
-                    >
-                      {item.title}
-                    </Link>
-                  </NavigationMenuLink>
-                )}
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+          {/* Desktop Navigation */}
+          <NavigationMenu className='hidden lg:flex flex-1'>
+            <NavigationMenuList>
+              {navigationItems.map(item => (
+                <NavigationMenuItem key={item.title}>
+                  {item.items ? (
+                    <>
+                      <NavigationMenuTrigger className='text-sm font-medium bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 pl-8 transition-all duration-200'>
+                        {item.title}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className='bg-background backdrop-blur-xl border border-white/20 rounded-lg shadow-2xl overflow-hidden'>
+                          <ul className='grid w-[400px] gap-3 md:w-[500px] md:grid-cols-2 lg:w-[600px] overflow-visible'>
+                            {item.items.map(subItem => (
+                              <ListItem
+                                key={subItem.title}
+                                title={subItem.title}
+                                description={subItem.description}
+                                href={subItem.href}
+                              />
+                            ))}
+                          </ul>
+                        </div>
+                      </NavigationMenuContent>
+                    </>
+                  ) : (
+                    <NavigationMenuLink asChild>
+                      <Link
+                        href={item.href}
+                        className='group inline-flex h-9 w-max items-center justify-center rounded-md bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-2 text-sm font-medium transition-all duration-200 hover:text-accent-foreground focus:bg-white/10 focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50'
+                      >
+                        {item.title}
+                      </Link>
+                    </NavigationMenuLink>
+                  )}
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
 
         {/* Right side actions */}
-        <div className='flex items-center space-x-3 ml-auto'>
+        <div className='flex flex-1 items-center  gap-2 justify-end'>
           {/* Social Icons - Hidden on mobile */}
           <div className='hidden md:flex items-center space-x-1'>
             <Button size='sm' variant='ghost' className='h-9 w-9 p-0'>
