@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "clean-cache": "npm cache clean --force",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
