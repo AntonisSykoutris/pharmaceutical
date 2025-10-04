@@ -3,18 +3,22 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
+  const { sessionId } = await params; // 👈 await the params Promise
+
   try {
     const supabase = await createClient();
-    
+
     // Get the current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const sessionId = params.sessionId;
 
     // Verify the session belongs to the user
     const { data: session, error: sessionError } = await supabase
@@ -41,7 +45,6 @@ export async function GET(
     }
 
     return NextResponse.json({ messages });
-
   } catch (error) {
     console.error('Messages error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

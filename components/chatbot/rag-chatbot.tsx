@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { extractTextFromMultiplePDFs } from '@/lib/pdf-utils';
 import {
   Send,
   Bot,
@@ -171,13 +172,29 @@ export function RAGChatbot({
     if (files.length === 0) return;
 
     setUploading(true);
-    const formData = new FormData();
-    Array.from(files).forEach(file => formData.append('files', file));
+    const fileArray = Array.from(files);
 
     try {
+      // Extract text from PDFs on the client side
+      const fileContents = await extractTextFromMultiplePDFs(fileArray);
+
+      // Prepare files for upload
+      const filesForUpload = fileArray.map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified,
+      }));
+
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          files: filesForUpload,
+          fileContents: fileContents,
+        }),
       });
 
       const data = await response.json();

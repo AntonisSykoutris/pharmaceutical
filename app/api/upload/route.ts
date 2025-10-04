@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createClientBrowser } from '@/lib/supabase/client';
-import { pdf } from 'pdf-parse';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
@@ -15,10 +14,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
+    const { files, fileContents } = await request.json();
     
-    if (files.length === 0) {
+    if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 });
     }
 
@@ -28,7 +26,10 @@ export async function POST(request: NextRequest) {
 
     const uploadedFiles = [];
 
-    for (const file of files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const content = fileContents[i];
+
       // Validate file type
       if (file.type !== 'application/pdf') {
         return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 });
@@ -40,13 +41,8 @@ export async function POST(request: NextRequest) {
       }
 
       const fileId = uuidv4();
-      const buffer = await file.arrayBuffer();
-      
-      // Parse PDF content
-      const pdfData = await pdf(Buffer.from(buffer));
-      const content = pdfData.text;
 
-      if (!content.trim()) {
+      if (!content || !content.trim()) {
         return NextResponse.json({ error: 'PDF appears to be empty or corrupted' }, { status: 400 });
       }
 
@@ -70,10 +66,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to create file record' }, { status: 500 });
       }
 
+      // Convert file to Blob for storage
+      const fileBlob = new Blob([new Uint8Array(await file.arrayBuffer())], { type: 'application/pdf' });
+      
       // Upload file to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('documents')
-        .upload(`${user.id}/${fileId}.pdf`, file, {
+        .upload(`${user.id}/${fileId}.pdf`, fileBlob, {
           cacheControl: '3600',
           upsert: false
         });
@@ -165,3 +164,4 @@ async function processPDFContent(content: string, fileId: string) {
 
   return chunks;
 }
+
