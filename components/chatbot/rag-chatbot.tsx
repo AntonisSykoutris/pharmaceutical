@@ -176,38 +176,55 @@ export function RAGChatbot({
 
     try {
       // Extract text from PDFs on the client side
+      console.log('Starting PDF text extraction...');
       const fileContents = await extractTextFromMultiplePDFs(fileArray);
 
-      // Prepare files for upload
-      const filesForUpload = fileArray.map(file => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        lastModified: file.lastModified,
-      }));
+      // Check if any files failed to parse
+      const failedFiles = fileContents.filter(content => !content.trim());
+      if (failedFiles.length > 0) {
+        console.warn(`${failedFiles.length} file(s) failed to parse`);
+      }
 
+      // Prepare FormData for upload
+      const formData = new FormData();
+
+      // Add files
+      fileArray.forEach(file => {
+        formData.append('files', file);
+      });
+
+      // Add extracted text contents
+      fileContents.forEach(content => {
+        formData.append('fileContents', content);
+      });
+
+      console.log('Uploading files to server...');
       const response = await fetch('/api/upload', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          files: filesForUpload,
-          fileContents: fileContents,
-        }),
+        body: formData,
       });
 
       const data = await response.json();
       if (data.success) {
         setUploadedFiles(prev => [...data.files, ...prev]);
         setSelectedFiles(prev => [...prev, ...data.files.map((f: any) => f.id)]);
-        alert(`Successfully uploaded ${data.files.length} file(s)`);
+
+        const successCount = data.files.length;
+        const failedCount = failedFiles.length;
+
+        if (failedCount > 0) {
+          alert(
+            `Successfully uploaded ${successCount} file(s). ${failedCount} file(s) failed to parse and were skipped.`
+          );
+        } else {
+          alert(`Successfully uploaded ${successCount} file(s)`);
+        }
       } else {
         alert(`Upload failed: ${data.error}`);
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed. Please try again.');
+      alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setUploading(false);
     }

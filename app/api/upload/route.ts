@@ -14,7 +14,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { files, fileContents } = await request.json();
+    const formData = await request.formData();
+    const files = formData.getAll('files') as File[];
+    const fileContents = formData.getAll('fileContents') as string[];
     
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files provided' }, { status: 400 });
@@ -43,7 +45,8 @@ export async function POST(request: NextRequest) {
       const fileId = uuidv4();
 
       if (!content || !content.trim()) {
-        return NextResponse.json({ error: 'PDF appears to be empty or corrupted' }, { status: 400 });
+        console.warn(`PDF ${file.name} appears to be empty or corrupted, skipping...`);
+        continue; // Skip this file instead of failing the entire upload
       }
 
       // Create file record in database
@@ -66,13 +69,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to create file record' }, { status: 500 });
       }
 
-      // Convert file to Blob for storage
-      const fileBlob = new Blob([new Uint8Array(await file.arrayBuffer())], { type: 'application/pdf' });
-      
       // Upload file to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('documents')
-        .upload(`${user.id}/${fileId}.pdf`, fileBlob, {
+        .upload(`${user.id}/${fileId}.pdf`, file, {
           cacheControl: '3600',
           upsert: false
         });
