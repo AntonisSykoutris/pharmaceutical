@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { InfoIcon } from 'lucide-react';
 import { FetchDataSteps } from '@/components/tutorial/fetch-data-steps';
+import { RAGChatbot } from '@/components/chatbot/rag-chatbot';
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
@@ -32,6 +33,14 @@ export default async function ProtectedPage() {
       <div>
         <h2 className='font-bold text-2xl mb-4'>Next steps</h2>
         <FetchDataSteps />
+      </div>
+      <div>
+        <h2 className='font-bold text-2xl mb-4'>RAG AI Assistant</h2>
+        <RAGChatbot
+          title='Pharmaceutical RAG Assistant'
+          placeholder='Upload PDF documents and ask me questions about them...'
+          welcomeMessage="Hello! I'm your RAG AI assistant. Upload pharmaceutical documents (PDFs) and I'll answer questions based on their content. I can help with drug regulations, interactions, guidelines, and more!"
+        />
       </div>
     </div>
   );
